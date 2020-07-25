@@ -5,11 +5,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Main {
 	static int boardSize = 8;
 	static String[][] board = new String[boardSize][boardSize];
-	//static String player = "BLACK";
+	static String player = "BLACK";
+	static int passCnt = 0;
+
+	static List<Map<String,Integer>> reverseList = new ArrayList<Map<String,Integer>>();
 
 	static final String EMPTY = "　";
 	static final String BLACK = "●";
@@ -20,21 +25,33 @@ public class Main {
 		display();
 		
 		Scanner sc = new Scanner(System.in);
-		while(true) {
-			int x = sc.nextInt();
-			int y = sc.nextInt();	    
-			String myColor = sc.next();
-			
-			if( canPut(x,y,myColor) ) {
-				board[x][y] = ( "WHITE".equals(myColor) ) ? WHITE : BLACK ;
-				display();
-			}else {
-				System.out.println("置けないよ");
-			}
+		while( true ) {
+			System.out.println( player + "のターン" );
+			if( passCheck() == false ) {
+				reverseList = new ArrayList<Map<String,Integer>>();
 
-			if("end".equals(myColor)) break;
+				int x = sc.nextInt();
+				int y = sc.nextInt();	    
+			
+				if( canPut(x,y) ) {
+					board[x][y] = ( "BLACK".equals(player) ) ? BLACK : WHITE;
+					reverse();
+					display();
+					player = ( "BLACK".equals(player) ) ? "WHITE" : "BLACK";
+				}else {
+					System.out.println("そこは置けないよ");
+					display();
+				}
+			}else{
+				if( passCnt == 2 ) break;
+				System.out.println( "置ける場所がないので、パスします。" );
+				player = ( "BLACK".equals(player) ) ? "WHITE" : "BLACK";
+			}
 		}
 	    sc.close();
+		
+	    System.out.println("試合終了");
+		
 	}
 	
 	private static void init(){
@@ -62,8 +79,21 @@ public class Main {
 
 		System.out.println(sb.toString());
 	}
+	
+	private static boolean passCheck() {
+		for(int y = 0; y < boardSize; y++) {
+			for(int x = 0; x < boardSize; x++) {
+				if( board[x][y] == EMPTY && canPut(x,y) ){
+					passCnt = 0;
+					return false;
+				}
+			}
+		}
+		passCnt++;
+		return true;
+	}
 
-	private static boolean canPut(int inputX,int inputY,String myColor){
+	private static boolean canPut(int inputX,int inputY){
 		boolean judge = false;
 		
 		int startY = inputY-1;
@@ -72,13 +102,13 @@ public class Main {
 		int startX = inputX-1;
 		int endX   = inputX+1;
 		
-		String enemy = ( "BLACK".equals(myColor) ) ? WHITE : BLACK;
+		String enemyPlayer = ( "BLACK".equals(player) ) ? WHITE : BLACK;
 		
 		for(int y = startY; y <= endY; y++) {
 			for(int x = startX; x <= endX; x++) {
 
-				if( x < 8 && y < 8 && x > -1 && y > -1 ){
-					if( board[x][y] == enemy ){
+				if( x < boardSize && y < boardSize && x > -1 && y > -1 ){
+					if( board[x][y] == enemyPlayer ){
 						String conX = "";
 						String conY = "";
 
@@ -94,7 +124,7 @@ public class Main {
 							case  1: conY = "plus";  break;
 						}
 
-						boolean reverseJudge = reverse(x,y,conX,conY,myColor);
+						boolean reverseJudge = canReverse(x,y,conX,conY);
 						if( judge != true ) judge = reverseJudge;
 					}
 				}
@@ -103,18 +133,18 @@ public class Main {
 		
 		return judge;
 	}
-	
-	private static boolean reverse(int x,int y, String conX, String conY,String myColor) {
+
+
+	private static boolean canReverse(int x,int y, String conX, String conY) {
 		boolean judge = false;
-
-		List<Map<String,Integer>> reverseList = new ArrayList<Map<String,Integer>>();
-
-		while(true) {			
+		List<Map<String,Integer>> tmpList = new ArrayList<Map<String,Integer>>();
+		
+		while(true) {
 			Map<String,Integer> reverseTarget = new LinkedHashMap<>();
 			reverseTarget.put("x",x);
 			reverseTarget.put("y",y);
-			reverseList.add(reverseTarget);
-			
+			tmpList.add(reverseTarget);
+
 			switch( conX ){
 				case "minus": x--; break;
 				case "plus" : x++; break;
@@ -124,26 +154,43 @@ public class Main {
 				case "minus": y--; break;
 				case "plus":  y++; break;
 			}
-			
-			String myPieceMark = ( "WHITE".equals(myColor) ) ? WHITE : BLACK ;
-			
-			if( myPieceMark.equals( board[x][y] ) ){
-				judge = true;
 
-				for( Map<String,Integer> target : reverseList ) {
-					int reverseX = target.get("x");
-					int reverseY = target.get("y");
-					
-					board[reverseX][reverseY] = myPieceMark;
-				}
+			if( x == boardSize-1 || y == boardSize-1 || x < 1 || y < 1 ) break;
+			
+			String myPieceMark = ( "BLACK".equals(player) ) ? BLACK : WHITE;
+			
+			if( board[x][y]!=null && myPieceMark.equals( board[x][y] ) ){
+				reverseList = Stream.concat(reverseList.stream(), tmpList.stream()).collect(Collectors.toList());
+				//debug();
+				judge = true;
 
 			}else if( board[x][y] == EMPTY ){
 				break;
 			}
-			
-			if( x == 7 || y == 7 || x == 0 || y == 0 ) break;
 		}
 
 		return judge;
+	}
+
+	
+	private static void reverse(){
+		for( Map<String,Integer> target : reverseList ) {
+			int reverseX = target.get("x");
+			int reverseY = target.get("y");
+
+			//System.out.println("x:"+reverseX+",y:"+reverseY);
+			
+			board[reverseX][reverseY] = ( "BLACK".equals(player) ) ? BLACK : WHITE;
+		}
+	}
+	
+	private static void debug(){
+		System.out.println("====debug start====");
+		for( Map<String,Integer> reverseTarget : reverseList ) {
+			for (String key : reverseTarget.keySet()) {
+				System.out.println(key + ":" + reverseTarget.get(key));
+			}
+	    }
+		System.out.println("====debug end====");
 	}
 }
