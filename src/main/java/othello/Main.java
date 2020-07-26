@@ -95,7 +95,7 @@ public class Main {
 	private static boolean passCheck() {
 		for(int y = 0; y < boardSize; y++) {
 			for(int x = 0; x < boardSize; x++) {
-				if( board[x][y] == EMPTY && canPut(x,y,false) ){
+				if( canPut(x,y,false) ){
 					passCnt = 0;
 					return false;
 				}
