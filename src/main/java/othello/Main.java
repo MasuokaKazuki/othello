@@ -12,8 +12,6 @@ public class Main {
 	static String player = "BLACK";
 	static int passCnt = 0;
 
-	static List<Map<String,Integer>> reverseList = new ArrayList<Map<String,Integer>>();
-
 	static final String EMPTY = "　";
 	static final String BLACK = "●";
 	static final String WHITE = "○";
@@ -27,8 +25,6 @@ public class Main {
 			while( true ) {
 				System.out.println( player + "のターン" );
 				if( passCheck() == false ) {
-					reverseList = new ArrayList<Map<String,Integer>>();
-
 					int x = sc.nextInt();
 					int y = sc.nextInt();
 					
