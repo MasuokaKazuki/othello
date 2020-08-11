@@ -1,11 +1,11 @@
 package othello.repository;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Service;
 
 import othello.model.BoardModel;
 
-@Service
 public interface BoardRepository extends CrudRepository<BoardModel, Integer> {
-
+    @Query(value = "SELECT * FROM board ORDER BY id DESC LIMIT 1", nativeQuery = true)
+    public BoardModel findLatest();
 }
