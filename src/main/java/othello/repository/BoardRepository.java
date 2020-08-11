@@ -3,9 +3,9 @@ package othello.repository;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
-import othello.model.User;
+import othello.model.BoardModel;
 
 @Service
-public interface UserRepository extends CrudRepository<User, Integer> {
+public interface BoardRepository extends CrudRepository<BoardModel, Integer> {
 
 }
