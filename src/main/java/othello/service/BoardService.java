@@ -240,12 +240,11 @@ public class BoardService {
 		}
 		return json;
 	}
-}
 
-@Getter
-@Setter
-class Piece{
-	int x;
-	int y;
+	@Getter
+	@Setter
+	private class Piece{
+		int x;
+		int y;
+	}
 }
-
