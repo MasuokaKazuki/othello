@@ -11,8 +11,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.Getter;
-import lombok.Setter;
+import othello.data.Piece;
+import othello.data.PutResult;
+import othello.data.ResetResult;
 import othello.model.BoardModel;
 import othello.repository.BoardRepository;
 
@@ -31,7 +32,7 @@ public class BoardService {
 
 	@Autowired
 	public BoardRepository boardRepository;
-
+	
 	public void init() {
 		this.board = boardRepository.findLatest();
 		this.player = board.getPlayer();
@@ -45,10 +46,14 @@ public class BoardService {
 			e.printStackTrace();
 		}
 	}
-	
-	public BoardModel reset() {
-		BoardModel board = new BoardModel();
 
+	public BoardModel getBoardData() {
+		return boardRepository.findLatest();
+	}	
+	
+	public ResetResult reset() {
+		ResetResult result = new ResetResult();
+		
 		this.pieces = new int[boardSize][boardSize];
 		
 		for (int i = 0; i < this.boardSize; i++) {
@@ -66,11 +71,14 @@ public class BoardService {
 		
 		board.setPieces(arrToJson(this.pieces));
 		board.setPlayer(this.player);
-		board.setPlayStyle("HUMAN");
+		board.setStatus("open");
 		
 		boardRepository.save(board);
 		
-		return board;
+		result.setResult(true);
+		result.setMessage("リセットしました。");
+		
+		return result;
 	}
 
 	public boolean passCheck(int player) {
@@ -85,29 +93,44 @@ public class BoardService {
 		return true;
 	}
 	
-	public boolean put(int targetX,int targetY){
+	public PutResult put(int targetX,int targetY){
 		this.init();
-		boolean result = false;
+
+		PutResult result = new PutResult();
+		result.setResult(false);
+
 		this.reversePieceList = new ArrayList<Piece>();
 		
 		if(canPut(targetX,targetY,player)) {
 			this.pieces[targetX][targetY] = this.player;
 			this.reverse();
+			String status = "open";
 			
 			int nextPlayer = ( BLACK == this.player ) ? WHITE : BLACK;
 
 			if( passCheck(this.player) == true && passCheck(nextPlayer) == true ) {
-				// 試合終了
+				status = "close";
+				result.setResult(true);
+				result.setMessage("試合は終了しました。");
+
 			}else if( passCheck(nextPlayer) == true ){
 				nextPlayer = this.player;
+				status = "pass";
+				result.setResult(true);
+				result.setMessage("置ける場所がないため、パスしました。");
 			}
 			
 			board.setPieces(arrToJson(this.pieces));
 			board.setPlayer(nextPlayer);
-			board.setPlayStyle("HUMAN");
+			board.setStatus(status);
 			boardRepository.save(board);
-			
-			result = true;
+
+			result.setResult(true);
+			result.setMessage("駒を配置しました。");
+
+		}else{
+			result.setResult(false);
+			result.setMessage("その位置に駒を置くことはできません");
 		}
 		
 		return result;
@@ -239,12 +262,5 @@ public class BoardService {
 			e.printStackTrace();
 		}
 		return json;
-	}
-
-	@Getter
-	@Setter
-	private class Piece{
-		int x;
-		int y;
 	}
 }
