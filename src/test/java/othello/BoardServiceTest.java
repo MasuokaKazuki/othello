@@ -25,6 +25,7 @@ public class BoardServiceTest {
     
     @Test
     public void put() {
+    	// 初期状態から、黒が x=2,y=4 に駒を配置した結果が正しいかチェック
     	boardService.reset();
     	boardService.put(2,4);
     	boardService.init();
