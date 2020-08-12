@@ -228,27 +228,6 @@ public class BoardService {
 		}
 	}
 	
-	public void display() {
-		this.init();
-		
-		System.out.println("プレイヤー:"+this.player);
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(" | 0| 1| 2| 3| 4| 5| 6| 7|\n");
-		sb.append(" ーーーーーーーーーーーーー\n");
-
-		for(int y = 0; y < boardSize; y++) {
-			sb.append(y).append("|");
-			for(int x = 0; x < boardSize; x++) {
-				sb.append(this.pieces[x][y]).append("|");
-			}
-			sb.append("\n");
-			sb.append(" ーーーーーーーーーーーーー\n");
-		}
-
-		System.out.println(sb.toString());
-	}
-	
 	public int[][] getPieces() {
 		return this.pieces;
 	}
