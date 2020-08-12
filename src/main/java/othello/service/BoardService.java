@@ -16,13 +16,6 @@ import lombok.Setter;
 import othello.model.BoardModel;
 import othello.repository.BoardRepository;
 
-@Getter
-@Setter
-class Piece{
-	int x;
-	int y;
-}
-
 @Service
 public class BoardService {
 	private int boardSize = 8;
@@ -112,7 +105,6 @@ public class BoardService {
 			board.setPieces(arrToJson(this.pieces));
 			board.setPlayer(nextPlayer);
 			board.setPlayStyle("HUMAN");
-			
 			boardRepository.save(board);
 			
 			result = true;
@@ -136,13 +128,13 @@ public class BoardService {
 		int startX = targetX-1;
 		int endX   = targetY+1;
 		
-		int rivalMark = ( "BLACK".equals(player) ) ? WHITE : BLACK;
+		int rivalPlayer = ( BLACK == player ) ? WHITE : BLACK;
 		
 		for(int y = startY; y <= endY; y++) {
 			for(int x = startX; x <= endX; x++) {
 
 				if( x < boardSize && y < boardSize && x > -1 && y > -1 ){
-					if( this.pieces[x][y] == rivalMark ){
+					if( this.pieces[x][y] == rivalPlayer ){
 						String conX = "";
 						String conY = "";
 						
@@ -171,9 +163,7 @@ public class BoardService {
 	}
 
 	private boolean canReverse(int x, int y, String conX, String conY, int player) {
-		boolean judge = false;
-		int playerMark = ( "BLACK".equals(player) ) ? BLACK : WHITE;
-		
+		boolean judge = false;		
 		List<Piece> tmpPieceList = new ArrayList<Piece>();
 
 		while(true) {
@@ -194,7 +184,7 @@ public class BoardService {
 
 			if( x > boardSize-1 || y > boardSize-1 || x < 0 || y < 0 ) break;
 			
-			if( this.pieces[x][y] == playerMark ){
+			if( this.pieces[x][y] == player ){
 				judge = true;
 				this.reversePieceList.addAll(tmpPieceList);
 				break;
@@ -211,7 +201,7 @@ public class BoardService {
 		for( Piece piece : this.reversePieceList ) {
 			int reverseX = piece.getX();
 			int reverseY = piece.getY();
-			this.pieces[reverseX][reverseY] = ( "BLACK".equals(this.player) ) ? BLACK : WHITE;
+			this.pieces[reverseX][reverseY] = this.player;
 		}
 	}
 	
@@ -251,3 +241,11 @@ public class BoardService {
 		return json;
 	}
 }
+
+@Getter
+@Setter
+class Piece{
+	int x;
+	int y;
+}
+
