@@ -28,7 +28,7 @@ public class BoardModel {
   @GeneratedValue(strategy=GenerationType.AUTO)
   private Integer id;
   private String pieces;
-  private String player;
+  private int    player;
   private String playStyle;
   
   @Column(name = "created_datetime")

@@ -23,12 +23,14 @@ public class ApiController {
   
   @GetMapping(path="/board/put")
   public @ResponseBody boolean boardPut(@RequestParam("x")Integer x, @RequestParam("y")Integer y) {	  
-	  return boardService.canPut(x,y);
+	  boardService.put(x,y);
+	  boardService.display();
+	  return false;
   }
 
-  @GetMapping(path="/board/test")
-  public @ResponseBody String test() {	  
-	  boardService.passCheck();
-	  return "kuso!!";
+  @GetMapping(path="/board/display")
+  public @ResponseBody boolean display() {	  
+	  boardService.display();
+	  return false;
   }
 }

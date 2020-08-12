@@ -1,5 +1,9 @@
 package othello.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -7,19 +11,30 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.Getter;
+import lombok.Setter;
 import othello.model.BoardModel;
 import othello.repository.BoardRepository;
+
+@Getter
+@Setter
+class Piece{
+	int x;
+	int y;
+}
 
 @Service
 public class BoardService {
 	private int boardSize = 8;
 	private BoardModel board = new BoardModel();
 	private int[][] pieces = new int[boardSize][boardSize];
-	private String player = "BLACK";    // or WHITE
+	private List<Piece> reversePieceList = new ArrayList<Piece>();
 
 	private final int EMPTY = -1;
 	private final int BLACK = 0;
 	private final int WHITE = 1;
+
+	private int player = BLACK;    // or WHITE
 
 	@Autowired
 	public BoardRepository boardRepository;
@@ -57,7 +72,7 @@ public class BoardService {
 		this.pieces[ halfSize     ][ halfSize     ] = BLACK;
 		
 		board.setPieces(arrToJson(this.pieces));
-		board.setPlayer("BLACK");
+		board.setPlayer(this.player);
 		board.setPlayStyle("HUMAN");
 		
 		boardRepository.save(board);
@@ -65,21 +80,52 @@ public class BoardService {
 		return board;
 	}
 
-	public boolean passCheck() {
-		init();
-		for(int y = 3; y < this.boardSize; y++) {
+	public boolean passCheck(int player) {
+		this.player = player;
+		for(int y = 0; y < this.boardSize; y++) {
 			for(int x = 0; x < this.boardSize; x++) {
-				System.out.println("x:"+x+"/y:"+y);
 				if( canPut(x,y) ){
-					System.out.println("↑おけます");
+					return false;
 				}
 			}
 		}
 		return true;
 	}
 	
-	
+	public boolean put(int targetX,int targetY){
+		this.init();
+		boolean result = false;
+		this.reversePieceList = new ArrayList<Piece>();
+		
+		if(canPut(targetX,targetY,player)) {
+			this.pieces[targetX][targetY] = this.player;
+			this.reverse();
+			
+			int nextPlayer = ( BLACK == this.player ) ? WHITE : BLACK;
+
+			if( passCheck(this.player) == true && passCheck(nextPlayer) == true ) {
+				// 試合終了
+			}else if( passCheck(nextPlayer) == true ){
+				nextPlayer = this.player;
+			}
+			
+			board.setPieces(arrToJson(this.pieces));
+			board.setPlayer(nextPlayer);
+			board.setPlayStyle("HUMAN");
+			
+			boardRepository.save(board);
+			
+			result = true;
+		}
+		
+		return result;
+	}
+
 	public boolean canPut(int targetX,int targetY) {
+		return this.canPut(targetX,targetY,this.player);
+	}
+	
+	public boolean canPut(int targetX,int targetY,int player) {
 		boolean judge = false;
 		
 		if( this.pieces[targetX][targetY] != EMPTY ) return false;
@@ -90,7 +136,7 @@ public class BoardService {
 		int startX = targetX-1;
 		int endX   = targetY+1;
 		
-		int rivalMark = ( "BLACK".equals(this.player) ) ? WHITE : BLACK;
+		int rivalMark = ( "BLACK".equals(player) ) ? WHITE : BLACK;
 		
 		for(int y = startY; y <= endY; y++) {
 			for(int x = startX; x <= endX; x++) {
@@ -99,8 +145,6 @@ public class BoardService {
 					if( this.pieces[x][y] == rivalMark ){
 						String conX = "";
 						String conY = "";
-
-System.out.println(x - targetX);
 						
 						switch( x - targetX ){
 							case -1: conX = "minus"; break;
@@ -114,10 +158,8 @@ System.out.println(x - targetX);
 							case  1: conY = "plus";  break;
 						}
 
-						if("none".equals(conX) && "none".equals(conY)) {
-							continue;
-						}else {
-							boolean reverseJudge = canReverse(x,y,conX,conY);
+						if(StringUtils.isNotEmpty(conX) && StringUtils.isNotEmpty(conY)) {
+							boolean reverseJudge = canReverse(x,y,conX,conY,player);
 							if( judge != true ) judge = reverseJudge;							
 						}
 					}
@@ -128,13 +170,18 @@ System.out.println(x - targetX);
 		return judge;
 	}
 
-	private boolean canReverse(int x, int y, String conX, String conY) {
+	private boolean canReverse(int x, int y, String conX, String conY, int player) {
 		boolean judge = false;
-		int playerMark = ( "BLACK".equals(this.player) ) ? BLACK : WHITE;
-		System.out.println("conX:"+conX);
-		System.out.println("conY:"+conY);
+		int playerMark = ( "BLACK".equals(player) ) ? BLACK : WHITE;
+		
+		List<Piece> tmpPieceList = new ArrayList<Piece>();
 
 		while(true) {
+			Piece tmpPiece = new Piece();
+			tmpPiece.setX(x);
+			tmpPiece.setY(y);
+			tmpPieceList.add(tmpPiece);
+
 			switch( conX ){
 				case "minus": x--; break;
 				case "plus" : x++; break;
@@ -149,6 +196,7 @@ System.out.println(x - targetX);
 			
 			if( this.pieces[x][y] == playerMark ){
 				judge = true;
+				this.reversePieceList.addAll(tmpPieceList);
 				break;
 
 			}else if( this.pieces[x][y] == EMPTY ){
@@ -157,6 +205,39 @@ System.out.println(x - targetX);
 		}
 
 		return judge;
+	}
+
+	private void reverse(){
+		for( Piece piece : this.reversePieceList ) {
+			int reverseX = piece.getX();
+			int reverseY = piece.getY();
+			this.pieces[reverseX][reverseY] = ( "BLACK".equals(this.player) ) ? BLACK : WHITE;
+		}
+	}
+	
+	public void display() {
+		this.init();
+		
+		System.out.println("プレイヤー:"+this.player);
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(" | 0| 1| 2| 3| 4| 5| 6| 7|\n");
+		sb.append(" ーーーーーーーーーーーーー\n");
+
+		for(int y = 0; y < boardSize; y++) {
+			sb.append(y).append("|");
+			for(int x = 0; x < boardSize; x++) {
+				sb.append(this.pieces[x][y]).append("|");
+			}
+			sb.append("\n");
+			sb.append(" ーーーーーーーーーーーーー\n");
+		}
+
+		System.out.println(sb.toString());
+	}
+	
+	public int[][] getPieces() {
+		return this.pieces;
 	}
 	
 	private String arrToJson(int[][] arr) {
@@ -169,5 +250,4 @@ System.out.println(x - targetX);
 		}
 		return json;
 	}
-
 }
