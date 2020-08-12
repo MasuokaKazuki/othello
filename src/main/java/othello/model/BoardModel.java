@@ -29,7 +29,7 @@ public class BoardModel {
   private Integer id;
   private String pieces;
   private int    player;
-  private String playStyle;
+  private String status;
   
   @Column(name = "created_datetime")
   private Date createdDatetime;
