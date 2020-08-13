@@ -17,6 +17,8 @@ public class BoardServiceTest {
     public void canPut() {
     	// 初期状態で黒が置ける場所のチェック
     	boardService.reset();
+    	assertTrue(boardService.canPut(4,2));
+    	assertTrue(boardService.canPut(5,3));
     	assertTrue(boardService.canPut(2,4));
     	assertTrue(boardService.canPut(3,5));
     	assertFalse(boardService.canPut(0,0));
