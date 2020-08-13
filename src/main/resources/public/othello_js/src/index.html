@@ -6,19 +6,13 @@
 <title>オセロゲーム</title>
 <style type="text/css">
     body{
-        position: relative;
-        height: 900px;
         background-color: #fff;
     }
 
     .main-content{
-        position: absolute;
-        top: 0%;
-        left: 30%;
-        width: 25%;
+        width: 760px;
         margin: 0 auto;
-        width: 500px;
-        height: 900px;
+        padding-top: 16px;
     }
 
     .main-content__title{
@@ -29,7 +23,26 @@
         margin: 0 0 10px 0;
     }
 
+    .main-content__message{
+        position: relative;
+        color:#fff;
+        background-color: #333;
+        float: left;
+        width: 150px;
+        height: 606px;
+        text-align: center;
+        box-shadow:
+            0 1.9px 2.5px rgba(0, 0, 0, 0.057),
+            0 5px 6.1px rgba(0, 0, 0, 0.076),
+            0 10.1px 11.4px rgba(0, 0, 0, 0.086),
+            0 19.2px 19.8px rgba(0, 0, 0, 0.092),
+            0 38.4px 34.8px rgba(0, 0, 0, 0.1),
+            0 101px 74px rgba(0, 0, 0, 0.13);
+    }
+
     .main-content__board{
+        float: left;
+        width: 610px;
         background: #54cf7f;
         box-shadow:
             0 1.9px 2.5px rgba(0, 0, 0, 0.057),
@@ -42,15 +55,15 @@
 
     table {
         border-collapse: collapse;
-        width: 500px;
+        width: 610px;
         border-radius: 50px;
     }
     
     td {
         border:1px solid #5ce68c;
         border-collapse: collapse;
-        width:62.5px;
-        height:62.5px;
+        width:73px;
+        height:73px;
         text-align: center;
         table-layout: fixed;
     }
@@ -72,18 +85,35 @@
         background: #333;
         filter: drop-shadow(4px 4px 4px rgba(0,0,0,0.6));
     }
+
+    .raised{
+        position:absolute;
+        left: 25px;
+        top: 530px;
+        display: inline-block;
+        background-color: #26a69b;
+        color: #FFF;
+        font-size: 1em;
+        line-height: 1;
+        text-decoration: none;
+        letter-spacing: 0.05em;
+        padding: 0.5em 1em;
+        border-radius: 3px;
+        cursor: pointer;
+        box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12), 0 3px 1px -2px rgba(0,0,0,0.2);/*影*/
+        -webkit-tap-highlight-color: transparent;
+        transition: .3s ease-out;
+        width:70px;
+    }
+
+    .raised:hover{
+        box-shadow: 0 3px 3px 0 rgba(0,0,0,0.14), 0 1px 7px 0 rgba(0,0,0,0.12), 0 3px 1px -1px rgba(0,0,0,0.2);/*浮き上がるように*/
+    }
 </style>
 </head>
 <body>
     <div class="main-content">
-        <div class="main-content__title">
-           <h1>オセロゲーム</h1>
-        </div>
         <div id="board"></div>
-        <p>黒：2枚 / 白：2枚</p>
-        <p>試合終了</p>
-        <p>引き分けです</p>
-        <a href="">最初から始める</a>
     </div>
 </body>
 </html>
