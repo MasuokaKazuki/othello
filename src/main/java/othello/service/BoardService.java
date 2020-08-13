@@ -101,7 +101,7 @@ public class BoardService {
 
 		this.reversePieceList = new ArrayList<Piece>();
 		
-		if(canPut(targetX,targetY,player)) {
+		if(canPut(targetX,targetY,this.player)) {
 			this.pieces[targetX][targetY] = this.player;
 			this.reverse();
 			String status = "open";
@@ -145,13 +145,13 @@ public class BoardService {
 		
 		if( this.pieces[targetX][targetY] != EMPTY ) return false;
 		
-		int startY = targetX-1;
+		int startY = targetY-1;
 		int endY   = targetY+1;
 
 		int startX = targetX-1;
-		int endX   = targetY+1;
+		int endX   = targetX+1;
 		
-		int rivalPlayer = ( BLACK == player ) ? WHITE : BLACK;
+		int rivalPlayer = ( player == BLACK ) ? WHITE : BLACK;
 		
 		for(int y = startY; y <= endY; y++) {
 			for(int x = startX; x <= endX; x++) {
@@ -172,7 +172,7 @@ public class BoardService {
 							case  0: conY = "none";  break;
 							case  1: conY = "plus";  break;
 						}
-
+						
 						if(StringUtils.isNotEmpty(conX) && StringUtils.isNotEmpty(conY)) {
 							boolean reverseJudge = canReverse(x,y,conX,conY,player);
 							if( judge != true ) judge = reverseJudge;							
@@ -188,6 +188,10 @@ public class BoardService {
 	private boolean canReverse(int x, int y, String conX, String conY, int player) {
 		boolean judge = false;		
 		List<Piece> tmpPieceList = new ArrayList<Piece>();
+		
+		if(StringUtils.isEmpty(conX) || StringUtils.isEmpty(conY)) {
+			return false;
+		}
 
 		while(true) {
 			Piece tmpPiece = new Piece();
