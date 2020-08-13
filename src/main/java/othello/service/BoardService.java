@@ -83,10 +83,9 @@ public class BoardService {
 	}
 
 	public boolean passCheck(int player) {
-		this.player = player;
 		for(int y = 0; y < this.boardSize; y++) {
 			for(int x = 0; x < this.boardSize; x++) {
-				if( canPut(x,y) ){
+				if( canPut(x,y,player) ){
 					return false;
 				}
 			}
