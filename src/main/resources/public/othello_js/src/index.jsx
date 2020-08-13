@@ -172,7 +172,6 @@ class Board extends React.Component {
                         <div className="main-content__message__content">
                             <p>黒 ... {blackCnt}</p>
                             <p>白 ... {whiteCnt}</p>
-                            {message && (<p>{message}</p>)}
                         </div>
 
                         <a href="javascript:void(0)" className="raised" onClick={(e) => this.resetClick(e)}>最初から<br/>始める</a>
