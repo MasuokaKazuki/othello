@@ -10,10 +10,22 @@ class Board extends React.Component {
             player: null,
             status: null,
             pieces: [],
+            blackCnt: null,
+            whiteCnt: null,
+            message: null,
         };
     }
 
     componentDidMount() {
+        this.init();
+    }
+
+    init(){
+        this.boardInit();
+        this.resultInit();
+    }
+
+    boardInit() {
         fetch("http://localhost:8080/api/v1/board/")
             .then(res => res.json())
             .then(
@@ -34,8 +46,76 @@ class Board extends React.Component {
             )
     }
 
+    resultInit() {
+        fetch("http://localhost:8080/api/v1/board/result/")
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    this.setState({
+                        isLoaded: true,
+                        message: result.message,
+                        blackCnt: result.blackCnt,
+                        whiteCnt: result.whiteCnt,
+                    });
+                },
+                (error) => {
+                    this.setState({
+                        isLoaded: true,
+                        error
+                    });
+                }
+            )
+    }
+
+    putClick(e) {
+        const x = e.target.getAttribute('data-x');
+        const y = e.target.getAttribute('data-y');
+        fetch("http://localhost:8080/api/v1/board/put/",{
+            method: "POST",
+            headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+            }),
+            body:'x='+x+'&y='+y
+        })
+        .then(res => res.json())
+        .then(
+            (result) => {
+                console.log(result);
+                this.init();
+            },
+            (error) => {
+                this.setState({
+                    isLoaded: true,
+                    error
+                });
+            }
+        )
+    }
+
+    resetClick(e) {
+        fetch("http://localhost:8080/api/v1/board/reset/",{
+            method: "POST",
+            headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
+            })
+        })
+        .then(res => res.json())
+        .then(
+            (result) => {
+                console.log(result);
+                this.init();
+            },
+            (error) => {
+                this.setState({
+                    isLoaded: true,
+                    error
+                });
+            }
+        )
+    }
+
     render () {
-        const { error, isLoaded, player, status, pieces } = this.state;
+        const { error, isLoaded, player, status, pieces, message, whiteCnt, blackCnt } = this.state;
         if (error) {
             return <div>エラーが発生しました: {error.message}</div>;
         } else if (!isLoaded) {
@@ -43,34 +123,60 @@ class Board extends React.Component {
         } else {
             return(
                 <>
-                <div className="main-content__board">
-                    <table>
-                        <tbody>
-                        {(() => {
-                            const items = [];
-                            for (var i = 0; i < pieces.length; i++){
-                                const cell = [];
-                                for (var j = 0; j < pieces[i].length; j++){
-                                    const cellContent = "";
-                                    switch( pieces[i][j] ) {
-                                        case 0:
-                                            cellContent = <span className="circle-black"></span>;
-                                            break;
-                                        case 1:
-                                            cellContent = <span className="circle-white"></span>;
-                                            break;
+                    <div className="main-content__board">
+                        <table>
+                            <tbody>
+                            {(() => {
+                                const items = [];
+                                for (var y = 0; y < pieces.length; y++){
+                                    const cell = [];
+                                    for (var x = 0; x < pieces[y].length; x++){
+                                        const cellContent = "";
+                                        switch( pieces[x][y] ) {
+                                            case 0:
+                                                cellContent = <span className="circle-black"></span>;
+                                                break;
+                                            case 1:
+                                                cellContent = <span className="circle-white"></span>;
+                                                break;
+                                        }
+                                        cell.push(<td key={x} data-x={x} data-y={y} onClick={(e) => this.putClick(e)}>{cellContent}</td>);
                                     }
-                                    cell.push(<td key={j}>{cellContent}</td>);
+                                    items.push(<tr key={y}>{cell}</tr>);
                                 }
-                                items.push(<tr key={i}>{cell}</tr>);
-                            }
-                            return items;
-                        })()}
-                        </tbody>
-                    </table>
-                </div>
-                <p>{player}</p>
-                <p>{status}</p>
+                                return items;
+                            })()}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className="main-content__message">
+                        <div className="main-content__message__content">
+                            {(() => {
+                                if (status!='close') {
+                                    const items = [];
+                                    if(status=='pass') {
+                                        items.push(<p>置ける場所がないため、パスしました</p>);
+                                    }
+                                    items.push(<p>{ player == 0 ? '黒' : '白' }の番です</p>);
+                                    return items;
+                                }else{
+                                    if(message){
+                                        return(
+                                            <p>{message}</p>
+                                        );    
+                                    }
+                                }
+                            })()}
+                        </div>
+
+                        <div className="main-content__message__content">
+                            <p>黒 ... {blackCnt}</p>
+                            <p>白 ... {whiteCnt}</p>
+                            {message && (<p>{message}</p>)}
+                        </div>
+
+                        <a href="javascript:void(0)" className="raised" onClick={(e) => this.resetClick(e)}>最初から<br/>始める</a>
+                    </div>
                 </>
             );
         }
