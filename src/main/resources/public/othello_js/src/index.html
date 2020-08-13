@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>オセロゲーム</title>
+<style type="text/css">
+    body{
+        position: relative;
+        height: 900px;
+        background-color: #fff;
+    }
+
+    .main-content{
+        position: absolute;
+        top: 0%;
+        left: 30%;
+        width: 25%;
+        margin: 0 auto;
+        width: 500px;
+        height: 900px;
+    }
+
+    .main-content__title{
+        text-align: center;
+    }
+
+    .main-content__title h1{
+        margin: 0 0 10px 0;
+    }
+
+    .main-content__board{
+        background: #54cf7f;
+        box-shadow:
+            0 1.9px 2.5px rgba(0, 0, 0, 0.057),
+            0 5px 6.1px rgba(0, 0, 0, 0.076),
+            0 10.1px 11.4px rgba(0, 0, 0, 0.086),
+            0 19.2px 19.8px rgba(0, 0, 0, 0.092),
+            0 38.4px 34.8px rgba(0, 0, 0, 0.1),
+            0 101px 74px rgba(0, 0, 0, 0.13);
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 500px;
+        border-radius: 50px;
+    }
+    
+    td {
+        border:1px solid #5ce68c;
+        border-collapse: collapse;
+        width:62.5px;
+        height:62.5px;
+        text-align: center;
+        table-layout: fixed;
+    }
+    .circle-white{
+        display: inline-block;
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        margin:2px;
+        background: #fff;
+        filter: drop-shadow(4px 4px 4px rgba(0,0,0,0.6));
+    }
+    .circle-black{
+        display: inline-block;
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        margin:2px;
+        background: #333;
+        filter: drop-shadow(4px 4px 4px rgba(0,0,0,0.6));
+    }
+</style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="main-content__title">
+           <h1>オセロゲーム</h1>
+        </div>
+        <div id="board"></div>
+        <p>黒：2枚 / 白：2枚</p>
+        <p>試合終了</p>
+        <p>引き分けです</p>
+        <a href="">最初から始める</a>
+    </div>
+</body>
+</html>
