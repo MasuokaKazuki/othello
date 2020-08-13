@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import othello.data.GameResult;
 import othello.data.Piece;
 import othello.data.PutResult;
 import othello.data.ResetResult;
@@ -54,7 +55,7 @@ public class BoardService {
 	public ResetResult reset() {
 		ResetResult result = new ResetResult();
 		
-		this.pieces = new int[boardSize][boardSize];
+		this.pieces = new int[this.boardSize][this.boardSize];
 		
 		for (int i = 0; i < this.boardSize; i++) {
 			for (int j = 0; j < this.boardSize; j++) {
@@ -69,11 +70,11 @@ public class BoardService {
 		this.pieces[ halfSize     ][ halfSize - 1 ] = WHITE;
 		this.pieces[ halfSize     ][ halfSize     ] = BLACK;
 		
-		board.setPieces(arrToJson(this.pieces));
-		board.setPlayer(this.player);
-		board.setStatus("open");
+		this.board.setPieces(arrToJson(this.pieces));
+		this.board.setPlayer(BLACK);
+		this.board.setStatus("open");
 		
-		boardRepository.save(board);
+		boardRepository.save(this.board);
 		
 		result.setResult(true);
 		result.setMessage("リセットしました。");
@@ -95,7 +96,6 @@ public class BoardService {
 	
 	public PutResult put(int targetX,int targetY){
 		this.init();
-
 		PutResult result = new PutResult();
 		result.setResult(false);
 
@@ -120,10 +120,10 @@ public class BoardService {
 				result.setMessage("置ける場所がないため、パスしました。");
 			}
 			
-			board.setPieces(arrToJson(this.pieces));
-			board.setPlayer(nextPlayer);
-			board.setStatus(status);
-			boardRepository.save(board);
+			this.board.setPieces(arrToJson(this.pieces));
+			this.board.setPlayer(nextPlayer);
+			this.board.setStatus(status);
+			boardRepository.save(this.board);
 
 			result.setResult(true);
 			result.setMessage("駒を配置しました。");
@@ -230,6 +230,40 @@ public class BoardService {
 			int reverseY = piece.getY();
 			this.pieces[reverseX][reverseY] = this.player;
 		}
+	}
+
+	public GameResult getResult() {
+		this.init();
+
+		GameResult result = new GameResult();
+		
+		int blackCnt = 0;
+		int whiteCnt = 0;
+
+		for(int y = 0; y < boardSize; y++) {
+			for(int x = 0; x < boardSize; x++) {
+				if( this.pieces[x][y] == BLACK ){ 
+					blackCnt++;
+				}else if( this.pieces[x][y] == WHITE ) {
+					whiteCnt++;
+				}
+			}
+		}
+		
+		String message = "";
+		if("close".equals(this.board.getStatus())){
+			if( blackCnt > whiteCnt ) {
+				message = "黒の勝利";
+			}else{
+				message = "白の勝利";
+			}
+		}
+		
+		result.setBlackCnt(blackCnt);
+		result.setWhiteCnt(whiteCnt);
+		result.setMessage(message);
+
+		return result;
 	}
 	
 	public int[][] getPieces() {
