@@ -33,7 +33,10 @@ public class BoardService {
 
 	@Autowired
 	public BoardRepository boardRepository;
-	
+
+	/**
+	 * 盤面の状況を取得し、各変数にセットする。
+	 */	
 	public void init() {
 		this.board = boardRepository.findLatest();
 		this.player = board.getPlayer();
@@ -48,10 +51,18 @@ public class BoardService {
 		}
 	}
 
+	/**
+	 * 盤面の状況を最新一件取得する。
+	 * @return 現在の盤の状況（プレイヤー,どの位置に駒が置かれているなど）
+	 */	
 	public BoardModel getBoardData() {
 		return boardRepository.findLatest();
 	}	
 	
+	/**
+	 * 盤面の状態を初期化する。
+	 * @return 実行結果
+	 */	
 	public ResetResult reset() {
 		ResetResult result = new ResetResult();
 		
@@ -82,6 +93,11 @@ public class BoardService {
 		return result;
 	}
 
+	/**
+	 * 盤面の状況から、パスするかどうか判定する。
+	 * @param player 対象のプレイヤー
+	 * @return true or false
+	 */	
 	public boolean passCheck(int player) {
 		for(int y = 0; y < this.boardSize; y++) {
 			for(int x = 0; x < this.boardSize; x++) {
@@ -93,10 +109,23 @@ public class BoardService {
 		return true;
 	}
 
+	/**
+	 * 盤面の指定の位置に駒を置き、データを更新する。
+	 * @param targetX 置きたい場所のx軸での位置
+	 * @param targetY 置きたい場所のy軸での位置
+	 * @return 処理結果
+	 */	
 	public PutResult put(int targetX,int targetY){
 		return put(targetX, targetY, player);
 	}
 	
+	/**
+	 * 盤面の指定の位置に駒を置き、データを更新する。
+	 * @param targetX 置きたい場所のx軸での位置
+	 * @param targetY 置きたい場所のy軸での位置
+	 * @param player 対象のプレイヤー
+	 * @return 処理結果
+	 */	
 	public PutResult put(int targetX,int targetY, int player){
 		this.init();
 		PutResult result = new PutResult();
@@ -137,10 +166,23 @@ public class BoardService {
 		return result;
 	}
 
+	/**
+	 * 盤面の指定の位置に駒が置けるかどうかを判定する。
+	 * @param targetX 置きたい場所のx軸での位置
+	 * @param targetY 置きたい場所のy軸での位置
+	 * @return true or false
+	 */	
 	public boolean canPut(int targetX,int targetY) {
 		return this.canPut(targetX,targetY,this.player);
 	}
-	
+
+	/**
+	 * 盤面の指定の位置に駒が置けるかどうかを判定する。
+	 * @param targetX 置きたい場所のx軸での位置
+	 * @param targetY 置きたい場所のy軸での位置
+	 * @param player 対象のプレイヤー
+	 * @return true or false
+	 */	
 	public boolean canPut(int targetX,int targetY,int player) {
 		boolean judge = false;
 		
@@ -186,6 +228,17 @@ public class BoardService {
 		return judge;
 	}
 
+	/**
+	 * 盤面の指定の位置に駒を置いて、敵の駒をひっくり返すことができるか判定する。
+	 * ※またひっくり返すことができると判定された場合、ひっくり返る対象の位置を変数にセットする。
+	 * 
+	 * @param targetX 置きたい場所のx軸での位置
+	 * @param targetY 置きたい場所のy軸での位置
+	 * @param conX 調査する範囲を指定（x軸）
+	 * @param conY 調査する範囲を指定（y軸）
+	 * @param player 対象のプレイヤー
+	 * @return true or false
+	 */	
 	private boolean canReverse(int x, int y, String conX, String conY, int player) {
 		boolean judge = false;		
 		List<Piece> tmpPieceList = new ArrayList<Piece>();
@@ -225,6 +278,9 @@ public class BoardService {
 		return judge;
 	}
 
+	/**
+	 * canReverseでセットしたひっくり返す対象の駒をひっくり返す処理。
+	 */	
 	private void reverse(){
 		for( Piece piece : this.reversePieceList ) {
 			int reverseX = piece.getX();
@@ -233,6 +289,10 @@ public class BoardService {
 		}
 	}
 
+	/**
+	 * ゲームの結果を返却する。（現在の駒数も返却する）
+	 * @return ゲーム結果 and 現在の駒数
+	 */	
 	public GameResult getResult() {
 		this.init();
 
@@ -267,15 +327,19 @@ public class BoardService {
 		return result;
 	}
 
+	/**
+	 * 盤面の駒をセットし、保存する。
+	 * ※正直、テストコード用のものなので、ここにあるのは微妙だと感じている。
+	 */	
 	public void setPiecesAndSave(int[][] pieces) {
 		this.board.setPieces(arrToJson(pieces));
 		boardRepository.save(this.board);
 	}
 	
-	public int[][] getPieces() {
-		return this.pieces;
-	}
-	
+	/**
+	 * int二次元配列をstringのJSON形式に変換
+	 * @return stringのJSON形式の値
+	 */	
 	private String arrToJson(int[][] arr) {
 		ObjectMapper mapper = new ObjectMapper();
 		String json = null;
