@@ -149,8 +149,8 @@ class Board extends React.Component {
                             </tbody>
                         </table>
                     </div>
-                    <div className="main-content__message">
-                        <div className="main-content__message__content">
+                    <div className="main-content__menu">
+                        <div className="main-content__menu__content">
                             {(() => {
                                 if (status!='close') {
                                     const items = [];
@@ -169,7 +169,7 @@ class Board extends React.Component {
                             })()}
                         </div>
 
-                        <div className="main-content__message__content">
+                        <div className="main-content__menu__content">
                             <p key="blackCnt">黒 ... {blackCnt}</p>
                             <p key="whiteCnt">白 ... {whiteCnt}</p>
                         </div>
