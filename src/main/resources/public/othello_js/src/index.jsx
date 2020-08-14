@@ -155,14 +155,14 @@ class Board extends React.Component {
                                 if (status!='close') {
                                     const items = [];
                                     if(status=='pass') {
-                                        items.push(<p>置ける場所がないため、パスしました</p>);
+                                        items.push(<p key="message">置ける場所がないため、パスしました</p>);
                                     }
-                                    items.push(<p>{ player == 0 ? '黒' : '白' }の番です</p>);
+                                    items.push(<p key="player">{ player == 0 ? '黒' : '白' }の番です</p>);
                                     return items;
                                 }else{
                                     if(message){
                                         return(
-                                            <p>{message}</p>
+                                            <p key="message">{message}</p>
                                         );    
                                     }
                                 }
@@ -170,11 +170,11 @@ class Board extends React.Component {
                         </div>
 
                         <div className="main-content__message__content">
-                            <p>黒 ... {blackCnt}</p>
-                            <p>白 ... {whiteCnt}</p>
+                            <p key="blackCnt">黒 ... {blackCnt}</p>
+                            <p key="whiteCnt">白 ... {whiteCnt}</p>
                         </div>
 
-                        <a href="javascript:void(0)" className="raised" onClick={(e) => this.resetClick(e)}>最初から<br/>始める</a>
+                        <a href="#" className="raised" onClick={(e) => this.resetClick(e)}>最初から<br/>始める</a>
                     </div>
                 </>
             );
