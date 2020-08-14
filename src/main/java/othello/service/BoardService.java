@@ -92,8 +92,12 @@ public class BoardService {
 		}
 		return true;
 	}
-	
+
 	public PutResult put(int targetX,int targetY){
+		return put(targetX, targetY, player);
+	}
+	
+	public PutResult put(int targetX,int targetY, int player){
 		this.init();
 		PutResult result = new PutResult();
 		result.setResult(false);
@@ -110,13 +114,11 @@ public class BoardService {
 			if( passCheck(this.player) == true && passCheck(nextPlayer) == true ) {
 				status = "close";
 				result.setResult(true);
-				result.setMessage("試合は終了しました。");
 
 			}else if( passCheck(nextPlayer) == true ){
 				nextPlayer = this.player;
 				status = "pass";
 				result.setResult(true);
-				result.setMessage("置ける場所がないため、パスしました。");
 			}
 			
 			this.board.setPieces(arrToJson(this.pieces));
@@ -252,9 +254,9 @@ public class BoardService {
 		String message = "";
 		if("close".equals(this.board.getStatus())){
 			if( blackCnt > whiteCnt ) {
-				message = "黒の勝利";
+				message = "黒の勝利です";
 			}else{
-				message = "白の勝利";
+				message = "白の勝利です";
 			}
 		}
 		
@@ -263,6 +265,11 @@ public class BoardService {
 		result.setMessage(message);
 
 		return result;
+	}
+
+	public void setPiecesAndSave(int[][] pieces) {
+		this.board.setPieces(arrToJson(pieces));
+		boardRepository.save(this.board);
 	}
 	
 	public int[][] getPieces() {
