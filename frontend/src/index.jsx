@@ -26,7 +26,7 @@ class Board extends React.Component {
     }
 
     boardInit() {
-        fetch("http://localhost:8080/api/v1/board/")
+        fetch("/api/v1/board/")
             .then(res => res.json())
             .then(
                 (result) => {
@@ -47,7 +47,7 @@ class Board extends React.Component {
     }
 
     resultInit() {
-        fetch("http://localhost:8080/api/v1/board/result/")
+        fetch("/api/v1/board/result/")
             .then(res => res.json())
             .then(
                 (result) => {
@@ -70,7 +70,7 @@ class Board extends React.Component {
     putClick(e) {
         const x = e.target.getAttribute('data-x');
         const y = e.target.getAttribute('data-y');
-        fetch("http://localhost:8080/api/v1/board/put/",{
+        fetch("/api/v1/board/put/",{
             method: "POST",
             headers: new Headers({
                 'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
@@ -93,7 +93,7 @@ class Board extends React.Component {
     }
 
     resetClick(e) {
-        fetch("http://localhost:8080/api/v1/board/reset/",{
+        fetch("/api/v1/board/reset/",{
             method: "POST",
             headers: new Headers({
                 'Content-Type': 'application/x-www-form-urlencoded', // <-- Specifying the Content-Type
