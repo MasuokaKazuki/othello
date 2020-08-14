@@ -150,6 +150,9 @@ class Board extends React.Component {
                         </table>
                     </div>
                     <div className="main-content__menu">
+                        <div className="main-content__menu__title">
+                            <h1>Othello</h1>
+                        </div>
                         <div className="main-content__menu__content">
                             {(() => {
                                 if (status!='close') {
