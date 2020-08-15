@@ -17,7 +17,13 @@ class Board extends React.Component {
     }
 
     componentDidMount() {
-        this.init();
+        this.intervalId = setInterval(()=>{
+            this.init();
+        }, 1000);
+    }
+
+    componentWillUnmount(){
+        clearInterval(this.intervalId);
     }
 
     init(){
