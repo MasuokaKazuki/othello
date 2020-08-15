@@ -66,28 +66,29 @@ public class BoardService {
 	public ResetResult reset() {
 		ResetResult result = new ResetResult();
 		
-		this.pieces = new int[this.boardSize][this.boardSize];
+		int[][] newPieces = new int[this.boardSize][this.boardSize];
 		
 		for (int i = 0; i < this.boardSize; i++) {
 			for (int j = 0; j < this.boardSize; j++) {
-				this.pieces[i][j] = EMPTY;
+				newPieces[i][j] = EMPTY;
 			}
 		}
 
 		int halfSize = this.boardSize / 2;
 		
-		this.pieces[ halfSize - 1 ][ halfSize - 1 ] = BLACK;
-		this.pieces[ halfSize - 1 ][ halfSize     ] = WHITE;
-		this.pieces[ halfSize     ][ halfSize - 1 ] = WHITE;
-		this.pieces[ halfSize     ][ halfSize     ] = BLACK;
+		newPieces[ halfSize - 1 ][ halfSize - 1 ] = BLACK;
+		newPieces[ halfSize - 1 ][ halfSize     ] = WHITE;
+		newPieces[ halfSize     ][ halfSize - 1 ] = WHITE;
+		newPieces[ halfSize     ][ halfSize     ] = BLACK;
+
+		BoardModel newBoard = new BoardModel();
+		newBoard.setPieces(arrToJson(newPieces));
+		newBoard.setPlayer(BLACK);
+		newBoard.setStatus("open");
+		boardRepository.save(newBoard);	
 		
-		this.board.setId(null);	
-		this.board.setPieces(arrToJson(this.pieces));
-		this.board.setPlayer(BLACK);
-		this.board.setStatus("open");
-		
-		boardRepository.save(this.board);
-		
+		this.init();
+
 		result.setResult(true);
 		result.setMessage("リセットしました。");
 		
@@ -150,10 +151,12 @@ public class BoardService {
 				status = "pass";
 				result.setResult(true);
 			}
-			this.board.setPieces(arrToJson(this.pieces));
-			this.board.setPlayer(nextPlayer);
-			this.board.setStatus(status);
-			boardRepository.save(this.board);
+			
+			BoardModel newBoard = new BoardModel();
+			newBoard.setPieces(arrToJson(this.pieces));
+			newBoard.setPlayer(nextPlayer);
+			newBoard.setStatus(status);
+			boardRepository.save(newBoard);
 
 			result.setResult(true);
 			result.setMessage("駒を配置しました。");
