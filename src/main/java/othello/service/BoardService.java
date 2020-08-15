@@ -150,7 +150,6 @@ public class BoardService {
 				status = "pass";
 				result.setResult(true);
 			}
-			this.board.setId(null);	
 			this.board.setPieces(arrToJson(this.pieces));
 			this.board.setPlayer(nextPlayer);
 			this.board.setStatus(status);
